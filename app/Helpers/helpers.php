@@ -114,6 +114,27 @@ if (!function_exists('sendFirebaseNotification')) {
         }
     }
 
+    if (!function_exists('generatePageUrl')) {
+        /**
+         * Generate a page URL using APP_BASE_URL
+         * 
+         * @param string $slug The page slug or ID
+         * @param string|null $ref The referral handle
+         * @return string
+         */
+        function generatePageUrl($slug, $ref = null)
+        {
+            $baseUrl = env('APP_BASE_URL', 'http://localhost:8000');
+            $url = rtrim($baseUrl, '/') . "/pages/{$slug}";
+            
+            if ($ref) {
+                $url .= "?ref=" . urlencode($ref);
+            }
+            
+            return $url;
+        }
+    }
+
 }
 
 

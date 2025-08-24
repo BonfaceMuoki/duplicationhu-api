@@ -12,6 +12,110 @@ use Illuminate\Support\Facades\Http;
 class MessagingService
 {
     /**
+     * Share page link and return client phone number and message
+     */
+    public function sharePageLink(array $data): array
+    {
+        try {
+            // Validate required fields
+            if (empty($data['page_url']) || empty($data['message'])) {
+                return [
+                    'success' => false,
+                    'error' => 'Page URL and message are required'
+                ];
+            }
+
+            // Validate message length
+            if (strlen($data['message']) > 1000) {
+                return [
+                    'success' => false,
+                    'error' => 'Message exceeds maximum length of 1000 characters'
+                ];
+            }
+
+            // Extract page slug from URL
+            $pageSlug = $this->extractPageSlugFromUrl($data['page_url']);
+            
+            if (!$pageSlug) {
+                return [
+                    'success' => false,
+                    'error' => 'Invalid page URL format'
+                ];
+            }
+
+            // Find the page
+            $page = Page::where('slug', $pageSlug)->first();
+            
+            if (!$page) {
+                return [
+                    'success' => false,
+                    'error' => 'Page not found'
+                ];
+            }
+
+            // Get the page owner's phone number
+            $user = $page->user;
+            $phoneNumber = $user->phone_number ?? $user->whatsapp_number ?? null;
+
+            if (!$phoneNumber) {
+                return [
+                    'success' => false,
+                    'error' => 'Page owner contact information not available'
+                ];
+            }
+
+            // Format the response
+            return [
+                'success' => true,
+                'data' => [
+                    'phone_number' => $phoneNumber,
+                    'message' => $data['message'],
+                    'page_title' => $page->title,
+                    'page_url' => $data['page_url'],
+                    'client_name' => $user->full_name ?? $user->first_name ?? 'Page Owner',
+                    'campaign_launched' => true,
+                    'timestamp' => now()->toISOString()
+                ]
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Error sharing page link', [
+                'data' => $data,
+                'error' => $e->getMessage()
+            ]);
+
+            return [
+                'success' => false,
+                'error' => 'An error occurred while processing your request'
+            ];
+        }
+    }
+
+    /**
+     * Extract page slug from URL
+     */
+    private function extractPageSlugFromUrl(string $url): ?string
+    {
+        // Parse the URL to extract the page slug
+        $parsedUrl = parse_url($url);
+        
+        if (!$parsedUrl || !isset($parsedUrl['path'])) {
+            return null;
+        }
+
+        // Extract the last part of the path (the slug)
+        $pathParts = explode('/', trim($parsedUrl['path'], '/'));
+        $slug = end($pathParts);
+
+        // Validate slug format (alphanumeric and hyphens only)
+        if (preg_match('/^[a-zA-Z0-9-]+$/', $slug)) {
+            return $slug;
+        }
+
+        return null;
+    }
+
+    /**
      * Send welcome messages to a new lead
      */
     public function sendWelcomeMessages(Lead $lead, Page $page, User $user): array

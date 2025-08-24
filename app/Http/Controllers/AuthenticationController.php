@@ -59,6 +59,13 @@ class AuthenticationController extends Controller
 
        return $result;
     }
+    
+    public function refresh(Request $request)
+    {
+        $result = $this->auth->refresh($request);
+        return $result;
+    }
+    
     public function verifyToken(){
         return response()->json(['message' => 'Token verified']);
     }
@@ -146,10 +153,10 @@ class AuthenticationController extends Controller
         }
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        $this->auth->logout();
-        return response()->json(['message' => 'Successfully logged out']);
+        $result = $this->auth->logout($request);
+        return $result;
     }
 
     public function health()

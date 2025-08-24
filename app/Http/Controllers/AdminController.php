@@ -386,7 +386,7 @@ class AdminController extends Controller
     public function updateLeadStatus(Request $request, Lead $lead)
     {
         $request->validate([
-            'status' => ['required', 'in:new,contacted,joined'],
+            'status' => ['required', 'in:new,contacted,joined,joining_link_shared,advertisement_link_shared'],
             'notes' => ['nullable', 'string'],
         ]);
 
@@ -476,7 +476,7 @@ class AdminController extends Controller
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 
                 // Store in public/images/pages directory
-                $path = $file->storeAs('images/pages', $filename, 'public');
+                $path = $file->storeAs('public/images/pages', $filename);
             }
 
             // Handle base64 image
@@ -503,8 +503,8 @@ class AdminController extends Controller
                 $filename = time() . '_' . uniqid() . '.' . $imageType;
                 
                 // Store base64 image
-                $path = 'images/pages/' . $filename;
-                \Storage::disk('public')->put($path, base64_decode($base64String));
+                $path = 'public/images/pages/' . $filename;
+                \Storage::put($path, base64_decode($base64String));
             }
 
             return response()->json([

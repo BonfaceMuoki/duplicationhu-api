@@ -172,7 +172,7 @@
     <style>
         /* Custom styles */
         .gradient-bg {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #87CEEB 0%, #000080 100%);
         }
         .text-shadow {
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
@@ -239,12 +239,12 @@
 
 @section('content')
 <!-- Header -->
-<header class="bg-gradient-to-br from-blue-50 to-indigo-100 shadow-lg border-b border-blue-200">
+<!-- <header class="bg-gradient-to-br from-gray-50 to-white shadow-lg border-b border-gray-200">
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="text-center">
-            <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">{{ $page->title }}</h1>
+            <h1 class="text-4xl md:text-6xl font-bold text-[#000080] mb-6 leading-tight">{{ $page->title }}</h1>
             @if($page->headline)
-                <p class="text-xl md:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed">{{ $page->headline }}</p>
+                <p class="text-xl md:text-2xl text-[#808080] mb-8 max-w-3xl mx-auto leading-relaxed">{{ $page->headline }}</p>
             @endif
             <div class="flex items-center justify-center space-x-6 text-sm text-gray-600 bg-white/70 backdrop-blur-sm rounded-full px-6 py-3 shadow-sm">
                 <span class="flex items-center">
@@ -258,7 +258,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
-                        {{ $page->user->name }}
+                        {{ $page->user->full_name }}
                     </span>
                 @endif
                 @if($page->views > 0)
@@ -273,7 +273,7 @@
             </div>
         </div>
     </div>
-</header>
+</header> -->
 
 <!-- Main Content -->
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -284,8 +284,8 @@
                 @if($page->image_url || $page->video_url)
                     <!-- Media Section -->
                     <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                            <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <h3 class="text-lg font-semibold text-[#000080] mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-[#87CEEB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                             </svg>
                             Media
@@ -382,15 +382,15 @@
                 
                 <!-- Quick Actions Sidebar -->
                 <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                        <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
-                        Quick Actions
-                    </h3>
+                                            <h3 class="text-lg font-semibold text-[#000080] mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-[#87CEEB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            Quick Actions
+                        </h3>
                     
                     <div class="space-y-3">
-                        <a href="#social-share" class="block w-full text-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                        <a href="#social-share" class="block w-full text-center px-4 py-2 bg-[#00FF00] text-[#FFFFFF] text-sm font-medium rounded-lg hover:bg-green-600 transition-colors duration-200">
                             Share Page
                         </a>
                         @if ($agent->isDesktop())
@@ -429,15 +429,15 @@
         <div class="lg:col-span-3">
             <article class="prose prose-lg max-w-none">
                 @if($page->summary)
-                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-500 p-8 mb-12 rounded-r-lg shadow-sm">
+                    <div class="bg-gradient-to-r from-gray-50 to-white border-l-4 border-[#87CEEB] p-8 mb-12 rounded-r-lg shadow-sm">
                         <div class="flex items-start">
                             <div class="flex-shrink-0">
-                                <svg class="w-6 h-6 text-blue-500 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-6 h-6 text-[#87CEEB] mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
                             </div>
                             <div class="ml-3">
-                                <p class="text-xl text-blue-900 font-semibold leading-relaxed">{{ $page->summary }}</p>
+                                <p class="text-xl text-[#000080] font-semibold leading-relaxed">{{ $page->summary }}</p>
                             </div>
                         </div>
                     </div>
@@ -445,12 +445,12 @@
                 
                 <!-- Call to Action - Positioned for immediate action -->
                 <div class="mb-12 text-center">
-                    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 shadow-xl">
-                        <h3 class="text-3xl font-bold text-white mb-4">Ready to take action?</h3>
-                        <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">Don't just read - implement these strategies and transform your business today.</p>
+                    <div class="bg-gradient-to-r from-[#000080] to-[#87CEEB] rounded-2xl p-8 shadow-xl">
+                        <h3 class="text-3xl font-bold text-[#FFFFFF] mb-4">Ready to take action?</h3>
+                        <p class="text-xl text-[#FFFFFF] mb-8 max-w-2xl mx-auto">Don't just read - implement these strategies and transform your business today.</p>
                         <div class="flex flex-col sm:flex-row gap-4 justify-center">
                             <button onclick="openInterestModal()" 
-                                    class="inline-flex items-center justify-center px-8 py-4 bg-yellow-400 text-gray-900 font-bold rounded-xl hover:bg-yellow-300 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                                    class="inline-flex items-center justify-center px-8 py-4 bg-[#00FF00] text-[#FFFFFF] font-bold rounded-xl hover:bg-green-600 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
@@ -483,7 +483,7 @@
                 </div>
                 
                 <div class="prose-content bg-white p-8 rounded-2xl shadow-lg">
-                    <div class="rich-text-content prose prose-lg max-w-none prose-headings:text-gray-900 prose-headings:font-bold prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-blue-600 prose-a:no-underline hover:prose-a:text-blue-800 prose-strong:text-gray-900 prose-strong:font-semibold prose-em:text-gray-800 prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-gray-700 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-li:marker:text-blue-600 prose-code:bg-gray-100 prose-code:text-gray-800 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto">
+                    <div class="rich-text-content prose prose-lg max-w-none prose-headings:text-[#000080] prose-headings:font-bold prose-p:text-[#808080] prose-p:leading-relaxed prose-a:text-[#87CEEB] prose-a:no-underline hover:prose-a:text-[#000080] prose-strong:text-[#000080] prose-strong:font-semibold prose-em:text-[#808080] prose-blockquote:border-l-4 prose-blockquote:border-[#87CEEB] prose-blockquote:pl-6 prose-blockquote:italic prose-blockquote:text-[#808080] prose-ul:text-[#808080] prose-ol:text-[#808080] prose-li:marker:text-[#87CEEB] prose-code:bg-gray-100 prose-code:text-[#808080] prose-code:px-2 prose-code:py-1 prose-code:rounded prose-pre:bg-gray-900 prose-pre:text-[#FFFFFF] prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto">
                         {!! $page->body !!}
                         </div>
                     
@@ -510,7 +510,7 @@
                             position: absolute;
                             left: 0;
                             font-weight: 600;
-                            color: #2563eb;
+                            color: #87CEEB;
                         }
                         
                         .rich-text-content ul li::before {
@@ -518,7 +518,7 @@
                             position: absolute;
                             left: 0;
                             font-weight: 600;
-                            color: #2563eb;
+                            color: #87CEEB;
                             font-size: 1.2em;
                         }
                         
@@ -565,13 +565,13 @@
             <div class="mt-16 pt-12 border-t border-gray-200" id="social-share">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
                     <div>
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Share this page</h3>
-                        <p class="text-gray-600">Help others discover this valuable content</p>
+                        <h3 class="text-2xl font-bold text-[#000080] mb-2">Share this page</h3>
+                        <p class="text-[#808080]">Help others discover this valuable content</p>
                     </div>
                     <div class="flex space-x-4">
                         <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(url()->current()) }}" 
                            target="_blank" rel="noopener noreferrer"
-                           class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2">
+                           class="bg-[#000080] text-[#FFFFFF] px-6 py-3 rounded-xl hover:bg-blue-800 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                             </svg>
@@ -579,7 +579,7 @@
                         </a>
                         <a href="https://twitter.com/intent/tweet?text={{ urlencode($page->title) }}&url={{ urlencode(url()->current()) }}" 
                            target="_blank" rel="noopener noreferrer"
-                           class="bg-blue-400 text-white px-6 py-3 rounded-xl hover:bg-blue-500 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2">
+                           class="bg-[#87CEEB] text-[#FFFFFF] px-6 py-3 rounded-xl hover:bg-blue-500 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.665 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
                             </svg>
@@ -587,7 +587,7 @@
                         </a>
                         <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ urlencode(url()->current()) }}" 
                            target="_blank" rel="noopener noreferrer"
-                           class="bg-blue-700 text-white px-6 py-3 rounded-xl hover:bg-blue-800 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2">
+                           class="bg-[#000080] text-[#FFFFFF] px-6 py-3 rounded-xl hover:bg-blue-800 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center space-x-2">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                             </svg>
@@ -599,14 +599,14 @@
             
             <!-- Author Bio -->
             @if($page->user)
-                <div class="mt-16 p-8 bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl shadow-lg border border-gray-200">
+                <div class="mt-16 p-8 bg-gradient-to-r from-gray-50 to-white rounded-2xl shadow-lg border border-gray-200">
                     <div class="flex items-center space-x-6">
-                        <div class="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-full flex items-center justify-center shadow-lg">
-                            <span class="text-white text-2xl font-bold">{{ substr($page->user->name, 0, 1) }}</span>
+                        <div class="w-20 h-20 bg-gradient-to-br from-[#000080] to-[#87CEEB] rounded-full flex items-center justify-center shadow-lg">
+                            <span class="text-[#FFFFFF] text-2xl font-bold">{{ substr($page->user->first_name, 0, 1) }}</span>
                         </div>
                         <div class="flex-1">
-                            <h4 class="text-2xl font-bold text-gray-900 mb-2">{{ $page->user->name }}</h4>
-                            <p class="text-gray-700 text-lg leading-relaxed">Business strategist and growth expert with years of experience helping companies scale and succeed.</p>
+                            <h4 class="text-2xl font-bold text-[#000080] mb-2">{{ $page->user->full_name }}</h4>
+                            <p class="text-[#808080] text-lg leading-relaxed">Business strategist and growth expert with years of experience helping companies scale and succeed.</p>
                         </div>
                     </div>
                 </div>
@@ -618,12 +618,12 @@
 
 <!-- Interest Modal -->
 <div id="interestModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <!-- Modal Header -->
         <div class="flex items-center justify-between p-6 border-b border-gray-200">
             <div>
-                <h3 class="text-2xl font-bold text-gray-900">Get Started Today</h3>
-                <p class="text-gray-600 mt-1">Let's discuss how we can help your business grow</p>
+                <h3 class="text-2xl font-bold text-[#000080]">Get Started Today</h3>
+                <p class="text-[#808080] mt-1">Let's discuss how we can help your business grow</p>
             </div>
             <button onclick="closeInterestModal()" class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -634,35 +634,87 @@
         
         <!-- Modal Body -->
         <div class="p-6">
-            <form id="interestForm" class="space-y-6">
+            <form id="interestForm" class="space-y-6" action="/leads/submit" method="POST">
                 @csrf
-                <input type="hidden" name="page_slug" value="{{ $page->slug }}">
+                <input type="hidden" name="page_id" value="{{ $page->id }}">
                 <input type="hidden" name="ref" value="{{ request()->get('ref', 'direct') }}">
                 <input type="hidden" name="source" value="interest_modal">
                 
-                <!-- Name Field -->
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-                    <input type="text" id="name" name="name" required
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                           placeholder="Enter your full name">
+                <!-- UTM Tracking Fields -->
+                <input type="hidden" name="utm_source" value="{{ request()->get('utm_source', '') }}">
+                <input type="hidden" name="utm_medium" value="{{ request()->get('utm_medium', '') }}">
+                <input type="hidden" name="utm_campaign" value="{{ request()->get('utm_campaign', '') }}">
+                
+                <!-- Name Fields Row -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- First Name Field -->
+                    <div>
+                        <label for="first_name" class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                        <input type="text" id="first_name" name="first_name" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                               placeholder="Enter your first name">
+                    </div>
+                    
+                    <!-- Middle Name Field -->
+                    <div>
+                        <label for="middle_name" class="block text-sm font-medium text-gray-700 mb-2">Middle Name</label>
+                        <input type="text" id="middle_name" name="middle_name"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                               placeholder="Enter your middle name (optional)">
+                    </div>
+                    
+                    <!-- Last Name Field -->
+                    <div>
+                        <label for="last_name" class="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                        <input type="text" id="last_name" name="last_name" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                               placeholder="Enter your last name">
+                    </div>
                 </div>
                 
-                <!-- Email Field -->
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-                    <input type="email" id="email" name="email" required
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                           placeholder="Enter your email address">
+                <!-- Demographics Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Date of Birth Field -->
+                    <div>
+                        <label for="date_of_birth" class="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
+                        <input type="date" id="date_of_birth" name="date_of_birth"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                               placeholder="Select your date of birth">
+                        <p class="text-xs text-gray-500 mt-1">This helps us provide age-appropriate content and services</p>
+                    </div>
+                    
+                    <!-- Gender Field -->
+                    <div>
+                        <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                        <select id="gender" name="gender" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                            <option value="">Select your gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                            <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                    </div>
                 </div>
                 
-                <!-- WhatsApp Number Field -->
-                <div>
-                    <label for="whatsapp_number" class="block text-sm font-medium text-gray-700 mb-2">WhatsApp Number</label>
-                    <input type="tel" id="whatsapp_number" name="whatsapp_number"
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                           placeholder="Enter your WhatsApp number (optional)">
-                    <p class="text-xs text-gray-500 mt-1">Include country code (e.g., +1 for US, +44 for UK)</p>
+                <!-- Contact Fields Row -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Email Field -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                        <input type="email" id="email" name="email" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                               placeholder="Enter your email address">
+                    </div>
+                    
+                    <!-- WhatsApp Number Field -->
+                    <div>
+                        <label for="whatsapp_number" class="block text-sm font-medium text-gray-700 mb-2">WhatsApp Number</label>
+                        <input type="tel" id="whatsapp_number" name="whatsapp_number"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+                               placeholder="Enter your WhatsApp number (optional)">
+                        <p class="text-xs text-gray-500 mt-1">Include country code (e.g., +1 for US, +44 for UK)</p>
+                    </div>
                 </div>
                 
                 <!-- Message Field -->
@@ -675,7 +727,7 @@
                 
                 <!-- Submit Button -->
                 <button type="submit" 
-                        class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                        class="w-full bg-gradient-to-r from-[#000080] to-[#87CEEB] text-[#FFFFFF] font-bold py-4 px-6 rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl">
                     <span class="flex items-center justify-center">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
@@ -703,10 +755,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
             </svg>
         </div>
-        <h3 class="text-2xl font-bold text-gray-900 mb-2">Thank You!</h3>
-        <p class="text-gray-600 mb-6">Your interest has been submitted successfully. We'll contact you soon!</p>
+        <h3 class="text-2xl font-bold text-[#000080] mb-2">Thank You!</h3>
+        <p class="text-[#808080] mb-6">Your interest has been submitted successfully. We'll contact you soon!</p>
         <button onclick="closeSuccessModal()" 
-                class="bg-blue-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-700 transition-colors duration-200">
+                class="bg-[#000080] text-[#FFFFFF] font-bold py-3 px-6 rounded-xl hover:bg-blue-700 transition-colors duration-200">
             Close
         </button>
     </div>
@@ -798,10 +850,10 @@ document.addEventListener('keydown', function(e) {
 @section('additional_css')
 <style>
     .prose-content {
-        @apply text-gray-800 leading-relaxed;
+        @apply text-[#808080] leading-relaxed;
     }
     .prose-content h1, .prose-content h2, .prose-content h3, .prose-content h4, .prose-content h5, .prose-content h6 {
-        @apply font-bold text-gray-900 mb-6 mt-10;
+        @apply font-bold text-[#000080] mb-6 mt-10;
     }
     .prose-content h1 { @apply text-4xl; }
     .prose-content h2 { @apply text-3xl; }
@@ -810,19 +862,19 @@ document.addEventListener('keydown', function(e) {
     .prose-content ul, .prose-content ol { @apply mb-6 pl-8; }
     .prose-content li { @apply mb-3 text-lg; }
     .prose-content blockquote { 
-        @apply border-l-4 border-blue-500 pl-6 italic text-gray-700 my-8 text-lg bg-blue-50 py-4 rounded-r-lg; 
+        @apply border-l-4 border-[#87CEEB] pl-6 italic text-[#808080] my-8 text-lg bg-gray-50 py-4 rounded-r-lg; 
     }
     .prose-content a { 
-        @apply text-blue-600 hover:text-blue-800 underline decoration-2 underline-offset-2 transition-colors duration-200; 
+        @apply text-[#87CEEB] hover:text-[#000080] underline decoration-2 underline-offset-2 transition-colors duration-200; 
     }
     .prose-content img { 
         @apply rounded-xl shadow-lg my-8 max-w-full h-auto; 
     }
     .prose-content code {
-        @apply bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-mono;
+        @apply bg-gray-100 text-[#808080] px-2 py-1 rounded text-sm font-mono;
     }
     .prose-content pre {
-        @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-6;
+        @apply bg-gray-900 text-[#FFFFFF] p-4 rounded-lg overflow-x-auto my-6;
     }
     .prose-content pre code {
         @apply bg-transparent text-inherit p-0;

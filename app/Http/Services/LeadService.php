@@ -22,10 +22,31 @@ class LeadService
             DB::beginTransaction();
 
             // Find the page and referrer invite
-            $page = Page::where('slug', $data['page_slug'])->firstOrFail();
+            $page = Page::findOrFail($data['page_id']);
+            
+            // Find or create the referrer invite
             $referrerInvite = PageInvite::where('page_id', $page->id)
                 ->where('handle', $data['ref'])
-                ->firstOrFail();
+                ->first();
+            
+            // If no referrer invite exists, create a default one
+            if (!$referrerInvite) {
+                $referrerInvite = PageInvite::create([
+                    'page_id' => $page->id,
+                    'user_id' => $page->user_id, // Use the page owner as the referrer
+                    'handle' => $data['ref'],
+                    'clicks' => 0,
+                    'leads_count' => 0,
+                    'is_active' => true,
+                ]);
+                
+                // Initialize closure table for the new referrer invite
+                DB::table('page_invite_closure')->insert([
+                    'ancestor_invite_id' => $referrerInvite->id,
+                    'descendant_invite_id' => $referrerInvite->id,
+                    'depth' => 0,
+                ]);
+            }
 
             // Check if user already exists
             $user = User::where('email', $data['email'])->first();
@@ -33,7 +54,11 @@ class LeadService
             if (!$user) {
                 // Create new user account for the lead
                 $user = User::create([
-                    'first_name' => $data['name'],
+                    'first_name' => $data['first_name'],
+                    'middle_name' => $data['middle_name'] ?? null,
+                    'last_name' => $data['last_name'],
+                    'date_of_birth' => $data['date_of_birth'] ?? null,
+                    'gender' => $data['gender'] ?? null,
                     'email' => $data['email'],
                     'phone_number' => $data['whatsapp_number'] ?? null,
                     'password' => Hash::make(Str::random(16)), // Temporary password
@@ -42,17 +67,19 @@ class LeadService
             }
 
             // Generate unique handle for this submitter
-            $submitterHandle = $this->generateUniqueHandle($page->id, $data['name']);
+            $submitterHandle = $this->generateUniqueHandle($page->id, $data['first_name']);
             
             // Create submitter invite
             $submitterInvite = PageInvite::create([
                 'page_id' => $page->id,
                 'user_id' => $user->id,
-                'handle' => $submitterHandle,
                 'clicks' => 0,
                 'leads_count' => 0,
                 'is_active' => true,
             ]);
+
+            // Get the auto-generated handle
+            $submitterHandle = $submitterInvite->handle;
 
             // Create the lead
             $lead = Lead::create([
@@ -60,7 +87,7 @@ class LeadService
                 'referrer_invite_id' => $referrerInvite->id,
                 'submitter_invite_id' => $submitterInvite->id,
                 'submitter_user_id' => $user->id,
-                'name' => $data['name'],
+                'name' => trim($data['first_name'] . ' ' . ($data['middle_name'] ?? '') . ' ' . $data['last_name']),
                 'email' => $data['email'],
                 'whatsapp_number' => $data['whatsapp_number'] ?? null,
                 'utm_source' => $data['utm_source'] ?? null,
@@ -81,7 +108,7 @@ class LeadService
             DB::commit();
 
             // Generate personalized link for the submitter
-            $myLink = url("/{$page->slug}?ref={$submitterHandle}");
+            $myLink = generatePageUrl($page->slug, $submitterHandle);
             
             // Generate redirect URL for referrer
             $redirectTo = $this->generateRedirectUrl($page, $referrerInvite->handle);
@@ -105,7 +132,7 @@ class LeadService
      */
     public function getUserLeads(User $user, int $perPage = 20): array
     {
-        $leads = Lead::with(['page', 'referrerInvite.user', 'submitterInvite.user'])
+        $leads = Lead::with(['page', 'referrerInvite.user', 'submitterInvite.user','leadShares'])
             ->where(function($query) use ($user) {
                 $query->where('submitter_user_id', $user->id)
                       ->orWhereHas('referrerInvite', function($q) use ($user) {
@@ -129,7 +156,7 @@ class LeadService
      */
     public function getAllLeads(array $filters = [], int $perPage = 50): array
     {
-        $query = Lead::with(['page', 'referrerInvite.user', 'submitterInvite.user', 'submitterUser']);
+        $query = Lead::with(['page', 'referrerInvite.user', 'submitterInvite.user', 'submitterUser','leadShares']);
 
         // Apply filters
         if (isset($filters['status'])) {
@@ -182,6 +209,67 @@ class LeadService
     }
 
     /**
+     * Update lead status and return with all relationships
+     */
+    public function updateStatus(Lead $lead, string $status, ?string $notes = null, array $additionalData = []): Lead
+    {
+        $lead->update([
+            'status' => $status,
+            'notes' => $notes,
+        ]);
+
+        // Handle joining_link_shared status
+        if ($status === 'joining_link_shared') {
+            $this->handleJoiningLinkShared($lead, $additionalData);
+        }
+
+        // Return the lead with all relationships loaded
+        return $lead->fresh([
+            'page',
+            'referrerInvite.user',
+            'submitterInvite.user',
+            'submitterUser',
+            'leadShares'
+        ]);
+    }
+
+    /**
+     * Handle joining_link_shared status by creating or updating PageInviteLinkShare
+     */
+    private function handleJoiningLinkShared(Lead $lead, array $additionalData): void
+    {
+        // Check if PageInviteLinkShare already exists for this lead
+        $existingShare = \App\Models\PageInviteLinkShare::where('page_id', $lead->page_id)
+            ->where('page_invite_id', $lead->referrer_invite_id)
+            ->first();
+
+        $shareData = [
+            'page_id' => $lead->page_id,
+            'page_invite_id' => $lead->referrer_invite_id,
+            'user_page_link' => $additionalData['landing_page_url'] ?? null,
+            'personal_message' => $additionalData['personal_message'] ?? null,
+            'registration_status' => 'pending',
+            'notes' => $additionalData['notes'] ?? null,
+            'metadata' => [
+                'lead_id' => $lead->id,
+                'lead_name' => $lead->name,
+                'lead_email' => $lead->email,
+                'shared_at' => now()->toISOString(),
+                'landing_page_url' => $additionalData['landing_page_url'] ?? null,
+                'personal_message' => $additionalData['personal_message'] ?? null,
+            ]
+        ];
+
+        if ($existingShare) {
+            // Update existing record
+            $existingShare->update($shareData);
+        } else {
+            // Create new record
+            \App\Models\PageInviteLinkShare::create($shareData);
+        }
+    }
+
+    /**
      * Get lead analytics for a specific page
      */
     public function getPageLeadAnalytics(Page $page, array $filters = []): array
@@ -226,22 +314,7 @@ class LeadService
         ];
     }
 
-    /**
-     * Generate unique handle for submitter
-     */
-    private function generateUniqueHandle(int $pageId, string $name): string
-    {
-        $baseHandle = Str::slug($name);
-        $handle = $baseHandle;
-        $counter = 1;
 
-        while (PageInvite::where('page_id', $pageId)->where('handle', $handle)->exists()) {
-            $handle = $baseHandle . $counter;
-            $counter++;
-        }
-
-        return $handle;
-    }
 
     /**
      * Update closure table with new relationship

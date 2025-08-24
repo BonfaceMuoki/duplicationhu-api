@@ -80,10 +80,6 @@ class Page extends Model
         'allowed_join_domains' => 'array',
     ];
 
-    protected $appends = [
-        'full_image_url'
-    ];
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -99,29 +95,8 @@ class Page extends Model
         return $this->hasMany(Lead::class);
     }
 
-    /**
-     * Get the full image URL with base URL appended
-     */
-    public function getFullImageUrlAttribute(): ?string
+    public function linkShares(): HasMany
     {
-        if (!$this->image_url) {
-            return null;
-        }
-
-        // If it's already a full URL, return as is
-        if (filter_var($this->image_url, FILTER_VALIDATE_URL)) {
-            return $this->image_url;
-        }
-
-        // If it's just a filename, append the storage URL
-        return asset('storage/images/pages/' . $this->image_url);
-    }
-
-    /**
-     * Get the full image URL for a specific image filename
-     */
-    public static function getImageUrl(string $filename): string
-    {
-        return asset('storage/images/pages/' . $filename);
+        return $this->hasMany(PageInviteLinkShare::class);
     }
 }

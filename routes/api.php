@@ -5,13 +5,14 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\PageViewController;
 use App\Http\Controllers\PageInviteController;
+use App\Http\Services\MessagingService;
 use Illuminate\Support\Facades\Route;
 
 // Public endpoints (no authentication required)
 Route::prefix('auth')->group(function () {
     Route::post('/register-user', [AuthenticationController::class, 'registerUser']);
     Route::post('/login', [AuthenticationController::class, 'login']);
-    Route::post('/logout', [AuthenticationController::class, 'logout']);
+    Route::post('/refresh', [AuthenticationController::class, 'refresh']);
     Route::post('/assign-user-admin', [AuthenticationController::class, 'assignUserAdmin']);
 });
 
@@ -39,10 +40,20 @@ Route::post('/leads/submit', [LeadController::class, 'submit']);
 // Invite tracking (public)
 Route::post('/invites/track-click', [PageInviteController::class, 'trackClick']);
 
+// Page sharing (public)
+Route::post('/pages/share', [MessagingService::class, 'sharePageLink']);
+
+// Page invite link shares (public)
+Route::prefix('page-invite-shares')->group(function () {
+    Route::post('/', [PageInviteController::class, 'createLinkShare']);
+    Route::get('/{share}', [PageInviteController::class, 'getLinkShare']);
+    Route::put('/{share}/status', [PageInviteController::class, 'updateLinkShareStatus']);
+});
+
 // Authenticated user endpoints
 Route::middleware('jwt.cookie')->group(function () {
     Route::post('/logout', [AuthenticationController::class, 'logout']);
-    Route::get('/me', [AuthenticationController::class, 'me']);  
+    Route::get('/me', [AuthenticationController::class, 'me']);
     
     // User leads
     Route::prefix('leads')->group(function () {

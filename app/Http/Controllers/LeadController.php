@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use App\Http\Services\LeadService;
 
 class LeadController extends Controller
 {
@@ -29,9 +30,13 @@ class LeadController extends Controller
     public function submit(Request $request)
     {
         $request->validate([
-            'page_slug' => 'required|string|exists:pages,slug',
+            'page_id' => 'required|integer|exists:pages,id',
             'ref' => 'required|string',
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'date_of_birth' => 'nullable|date',
+            'gender' => 'nullable|string|in:Male,Female,Other,Prefer not to say',
             'email' => 'required|email|max:255',
             'whatsapp_number' => 'nullable|string|max:20',
             'utm_source' => 'nullable|string|max:100',
@@ -43,10 +48,31 @@ class LeadController extends Controller
             DB::beginTransaction();
 
             // Find the page and referrer invite
-            $page = Page::where('slug', $request->page_slug)->firstOrFail();
+            $page = Page::findOrFail($request->page_id);
+            
+            // Find or create the referrer invite
             $referrerInvite = PageInvite::where('page_id', $page->id)
                 ->where('handle', $request->ref)
-                ->firstOrFail();
+                ->first();
+            
+            // If no referrer invite exists, create a default one
+            if (!$referrerInvite) {
+                $referrerInvite = PageInvite::create([
+                    'page_id' => $page->id,
+                    'user_id' => $page->user_id, // Use the page owner as the referrer
+                    'handle' => $request->ref,
+                    'clicks' => 0,
+                    'leads_count' => 0,
+                    'is_active' => true,
+                ]);
+                
+                // Initialize closure table for the new referrer invite
+                DB::table('page_invite_closure')->insert([
+                    'ancestor_invite_id' => $referrerInvite->id,
+                    'descendant_invite_id' => $referrerInvite->id,
+                    'depth' => 0,
+                ]);
+            }
 
             // Check if user already exists
             $user = User::where('email', $request->email)->first();
@@ -54,7 +80,11 @@ class LeadController extends Controller
             if (!$user) {
                 // Create new user account for the lead
                 $user = User::create([
-                    'first_name' => $request->name,
+                    'first_name' => $request->first_name,
+                    'middle_name' => $request->middle_name,
+                    'last_name' => $request->last_name,
+                    'date_of_birth' => $request->date_of_birth,
+                    'gender' => $request->gender,
                     'email' => $request->email,
                     'phone_number' => $request->whatsapp_number,
                     'password' => Hash::make(Str::random(16)), // Temporary password
@@ -62,18 +92,17 @@ class LeadController extends Controller
                 ]);
             }
 
-            // Generate unique handle for this submitter
-            $submitterHandle = $this->generateUniqueHandle($page->id, $request->name);
-            
-            // Create submitter invite
+            // Create submitter invite (handle will be auto-generated)
             $submitterInvite = PageInvite::create([
                 'page_id' => $page->id,
                 'user_id' => $user->id,
-                'handle' => $submitterHandle,
                 'clicks' => 0,
                 'leads_count' => 0,
                 'is_active' => true,
             ]);
+
+            // Get the auto-generated handle
+            $submitterHandle = $submitterInvite->handle;
 
             // Create the lead
             $lead = Lead::create([
@@ -81,7 +110,7 @@ class LeadController extends Controller
                 'referrer_invite_id' => $referrerInvite->id,
                 'submitter_invite_id' => $submitterInvite->id,
                 'submitter_user_id' => $user->id,
-                'name' => $request->name,
+                'name' => trim($request->first_name . ' ' . ($request->middle_name ?? '') . ' ' . $request->last_name),
                 'email' => $request->email,
                 'whatsapp_number' => $request->whatsapp_number,
                 'utm_source' => $request->utm_source,
@@ -105,7 +134,7 @@ class LeadController extends Controller
             $messagingResults = $this->messagingService->sendWelcomeMessages($lead, $page, $user);
 
             // Generate personalized link for the submitter
-            $myLink = url("/{$page->slug}?ref={$submitterHandle}");
+            $myLink = generatePageUrl($page->id, $submitterHandle);
             
             // Generate redirect URL for referrer
             $redirectTo = $this->generateRedirectUrl($page, $referrerInvite->handle);
@@ -274,14 +303,29 @@ class LeadController extends Controller
     public function updateStatus(Request $request, Lead $lead)
     {
         $request->validate([
-            'status' => 'required|in:new,contacted,joined',
+            'status' => 'required|in:new,contacted,joined,joining_link_shared,advertisement_link_shared',
             'notes' => 'nullable|string',
+            'landing_page_url' => 'nullable|url|required_if:status,joining_link_shared',
+            'personal_message' => 'nullable|string|required_if:status,joining_link_shared',
         ]);
 
-        $lead->update([
-            'status' => $request->status,
-            'notes' => $request->notes,
-        ]);
+        $additionalData = [];
+        
+        // Collect additional data for joining_link_shared status
+        if ($request->status === 'joining_link_shared') {
+            $additionalData = [
+                'landing_page_url' => $request->landing_page_url,
+                'personal_message' => $request->personal_message,
+                'notes' => $request->notes,
+            ];
+        }
+
+        $lead = app(LeadService::class)->updateStatus(
+            $lead,
+            $request->status,
+            $request->notes,
+            $additionalData
+        );
 
         return response()->json([
             'success' => true,
@@ -290,22 +334,7 @@ class LeadController extends Controller
         ]);
     }
 
-    /**
-     * Generate unique handle for submitter
-     */
-    private function generateUniqueHandle(int $pageId, string $name): string
-    {
-        $baseHandle = Str::slug($name);
-        $handle = $baseHandle;
-        $counter = 1;
 
-        while (PageInvite::where('page_id', $pageId)->where('handle', $handle)->exists()) {
-            $handle = $baseHandle . $counter;
-            $counter++;
-        }
-
-        return $handle;
-    }
 
     /**
      * Update closure table with new relationship

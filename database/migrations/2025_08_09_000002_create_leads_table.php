@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
 
-            $table->enum('status', ['new', 'contacted', 'joined'])->default('new');
+            $table->enum('status', ['new', 'contacted', 'joined', 'joining_link_shared', 'advertisement_link_shared'])->default('new');
             $table->text('notes')->nullable();
 
             $table->timestamps();

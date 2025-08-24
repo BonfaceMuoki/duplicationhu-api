@@ -6,6 +6,7 @@ use App\Enums\LeadStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Lead extends Model
 {
@@ -54,5 +55,15 @@ class Lead extends Model
     public function submitterUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'submitter_user_id');
+    }
+
+    /**
+     * Get the page invite link shares associated with this lead.
+     * This relationship connects leads to the page invite link shares
+     * that were used to generate them.
+     */
+    public function leadShares(): HasMany
+    {
+        return $this->hasMany(\App\Models\PageInviteLinkShare::class, 'page_invite_id', 'referrer_invite_id');
     }
 }

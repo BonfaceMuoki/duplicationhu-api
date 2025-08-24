@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Page;
 use App\Models\PageInvite;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class PageInviteController extends Controller
@@ -15,14 +16,35 @@ class PageInviteController extends Controller
     public function trackClick(Request $request)
     {
         $request->validate([
-            'page_slug' => 'required|string|exists:pages,slug',
+            'page_id' => 'required|integer|exists:pages,id',
             'ref' => 'required|string',
         ]);
 
-        $page = Page::where('slug', $request->page_slug)->firstOrFail();
+        $page = Page::findOrFail($request->page_id);
+        
+        // Find or create the invite
         $invite = PageInvite::where('page_id', $page->id)
             ->where('handle', $request->ref)
-            ->firstOrFail();
+            ->first();
+        
+        // If no invite exists, create a default one
+        if (!$invite) {
+            $invite = PageInvite::create([
+                'page_id' => $page->id,
+                'user_id' => $page->user_id, // Use the page owner as the referrer
+                'handle' => $request->ref,
+                'clicks' => 0,
+                'leads_count' => 0,
+                'is_active' => true,
+            ]);
+            
+            // Initialize closure table for the new invite
+            DB::table('page_invite_closure')->insert([
+                'ancestor_invite_id' => $invite->id,
+                'descendant_invite_id' => $invite->id,
+                'depth' => 0,
+            ]);
+        }
 
         // Increment click count
         $invite->increment('clicks');
@@ -211,6 +233,80 @@ class PageInviteController extends Controller
                 'upline' => $ancestors,
                 'downline' => $descendants,
             ]
+        ]);
+    }
+
+    /**
+     * Create a new page invite link share
+     */
+    public function createLinkShare(Request $request)
+    {
+        $request->validate([
+            'page_id' => 'required|integer|exists:pages,id',
+            'page_invite_id' => 'required|integer|exists:page_invites,id',
+            'user_page_link' => 'required|string|max:500',
+            'notes' => 'nullable|string|max:1000',
+            'metadata' => 'nullable|array'
+        ]);
+
+        // Verify that the page invite belongs to the specified page
+        $pageInvite = PageInvite::where('id', $request->page_invite_id)
+            ->where('page_id', $request->page_id)
+            ->first();
+
+        if (!$pageInvite) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Page invite not found for the specified page'
+            ], 404);
+        }
+
+        $linkShare = \App\Models\PageInviteLinkShare::create([
+            'page_id' => $request->page_id,
+            'page_invite_id' => $request->page_invite_id,
+            'user_page_link' => $request->user_page_link,
+            'registration_status' => 'pending',
+            'notes' => $request->notes,
+            'metadata' => $request->metadata
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Link share created successfully',
+            'data' => $linkShare->load(['page', 'pageInvite'])
+        ], 201);
+    }
+
+    /**
+     * Get a specific page invite link share
+     */
+    public function getLinkShare(\App\Models\PageInviteLinkShare $share)
+    {
+        return response()->json([
+            'success' => true,
+            'data' => $share->load(['page', 'pageInvite'])
+        ]);
+    }
+
+    /**
+     * Update the registration status of a link share
+     */
+    public function updateLinkShareStatus(Request $request, \App\Models\PageInviteLinkShare $share)
+    {
+        $request->validate([
+            'registration_status' => 'required|in:pending,registered,completed,failed',
+            'notes' => 'nullable|string|max:1000'
+        ]);
+
+        $share->update([
+            'registration_status' => $request->registration_status,
+            'notes' => $request->notes
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Link share status updated successfully',
+            'data' => $share->load(['page', 'pageInvite'])
         ]);
     }
 } 
