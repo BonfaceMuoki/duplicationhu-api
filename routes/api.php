@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\PageViewController;
 use App\Http\Controllers\PageInviteController;
+use App\Http\Controllers\ReferralController;
 use App\Http\Services\MessagingService;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthenticationController::class, 'login']);
     Route::post('/refresh', [AuthenticationController::class, 'refresh']);
     Route::post('/assign-user-admin', [AuthenticationController::class, 'assignUserAdmin']);
+    Route::post('/expire-access-token', [AuthenticationController::class, 'expireAccessToken']);
 });
 
 Route::get('/health', [AuthenticationController::class, 'health']);
@@ -65,15 +67,35 @@ Route::middleware('jwt.cookie')->group(function () {
     });
     
     // User invites
-    Route::prefix('invites')->group(function () {
+    Route::middleware('jwt.cookie')->prefix('invites')->group(function () {
         Route::get('/my-invites', [PageInviteController::class, 'myInvites']);
         Route::post('/create', [PageInviteController::class, 'createInvite']);
         Route::put('/{invite}', [PageInviteController::class, 'updateInvite']);
         Route::delete('/{invite}', [PageInviteController::class, 'deleteInvite']);
         Route::get('/{invite}/referral-tree', [PageInviteController::class, 'getReferralTree']);
+        
+        // Referral analytics and statistics
+        Route::get('/{invite}/direct-referrals', [ReferralController::class, 'getDirectReferrals']);
+        Route::get('/{invite}/upline', [ReferralController::class, 'getUpline']);
+        Route::get('/{invite}/referral-stats', [ReferralController::class, 'getReferralStats']);
+        Route::get('/{invite}/referral-network', [ReferralController::class, 'getReferralNetwork']);
+        Route::get('/{invite}/my-joiners', [ReferralController::class, 'getLevelOneInviteesDetails']);
     });
     
 
+});
+
+// Referral analytics and performance (public, but methods might require auth internally)
+Route::prefix('referrals')->group(function () {
+    Route::get('/my-performance', [ReferralController::class, 'getMyReferralPerformance']);
+    Route::get('/pages/{page}/analytics', [ReferralController::class, 'getPageReferralAnalytics']);
+    Route::get('/pages/{page}/leaderboard', [ReferralController::class, 'getReferralLeaderboard']);
+    Route::get('/users/{user}/performance', [ReferralController::class, 'getUserReferralPerformance']);
+});
+
+// Dashboard summary - User specific (requires authentication)
+Route::middleware('jwt.cookie')->group(function () {
+    Route::get('/dashboard/my-summary', [ReferralController::class, 'getMyDashboardSummary']);
 });
 
 // Admin-only endpoints
@@ -110,6 +132,16 @@ Route::middleware(['jwt.cookie', 'role:super admin'])
     
     // Invite management
     Route::get('/invites', [PageInviteController::class, 'allInvites']);
+    
+    // Referral management (admin only)
+    Route::prefix('referrals')->group(function () {
+        Route::put('/invites/{invite}/relationship', [ReferralController::class, 'updateReferralRelationship']);
+        Route::get('/pages/{page}/analytics', [ReferralController::class, 'getPageReferralAnalytics']);
+        Route::get('/users/{user}/performance', [ReferralController::class, 'getUserReferralPerformance']);
+    });
+    
+    // Admin dashboard - Full system overview
+    Route::get('/dashboard/summary', [ReferralController::class, 'getDashboardSummary']);
     
     // Dashboard
     Route::get('/dashboard', [AdminController::class, 'dashboard']);

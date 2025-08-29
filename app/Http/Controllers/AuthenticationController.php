@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Services\AuthenticationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\JsonResponse;
 
 class AuthenticationController extends Controller
 {
@@ -158,6 +159,19 @@ class AuthenticationController extends Controller
         $result = $this->auth->logout($request);
         return $result;
     }
+
+    /**
+     * Expire only the access token
+     */
+    public function expireAccessToken(Request $request): JsonResponse
+    {
+        $result = $this->auth->expireAccessToken($request);
+        return $result;
+    }
+
+    /**
+     * Refresh the access token
+     */
 
     public function health()
     {

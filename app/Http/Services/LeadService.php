@@ -289,8 +289,8 @@ class LeadService
 
         // Calculate conversion rates by invite
         $inviteStats = $page->invites()
-            ->withCount(['referrerLeads as total_leads'])
-            ->withSum('referrerLeads', 'clicks')
+            ->withCount(['referredLeads as total_leads'])
+            ->withSum('referredLeads', 'clicks')
             ->get()
             ->map(function($invite) {
                 $invite->conversion_rate = $invite->clicks > 0 

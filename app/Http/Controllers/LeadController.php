@@ -265,7 +265,7 @@ class LeadController extends Controller
     public function myLeads(Request $request)
     {
         $user = auth()->user();
-        
+                
         $leads = Lead::with(['page', 'referrerInvite.user', 'submitterInvite.user'])
             ->where(function($query) use ($user) {
                 $query->where('submitter_user_id', $user->id)
